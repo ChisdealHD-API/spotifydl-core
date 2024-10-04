@@ -16,8 +16,6 @@ export default async (data: ITrack, file: string): Promise<string> => {
         attachments: [data.cover_url]
     }
 
-    console.log(metadata)
-
     const coverURL = metadata.attachments?.[0] ?? '';
     const response = await axios.get(coverURL, { responseType: 'arraybuffer' });
     writeFileSync(`${os.tmpdir()}/cover.jpg`, response.data);
