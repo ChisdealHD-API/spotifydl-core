@@ -91,16 +91,15 @@ export default class SpotifyFetcher extends SpotifyApi {
      */
     downloadTrack = async <T extends undefined | string>(
         url: string,
-        destinationDir: string,
-        filename?: T
+        destinationDir: string
     ): Promise<T extends undefined ? Buffer : string> => {
         await this.verifyCredentials()
         const info = await this.getTrack(url)
         const link = await getYtlink(`${info.name} ${info.artists[0]}`)
         if (!link) throw new SpotifyDlError(`Couldn't get a download URL for the track: ${info.name}`)
-        const data = await downloadYTAndSave(info, link, filename, destinationDir)
+        const data = await downloadYTAndSave(link, destinationDir)
         await metadata(info, data)
-        if (!filename) {
+        if (!destinationDir) {
             const buffer = await promises.readFile(data)
             unlink(data)
             /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -118,7 +117,7 @@ export default class SpotifyFetcher extends SpotifyApi {
     downloadTrackFromInfo = async (info: SongDetails, destinationDir: string): Promise<Buffer> => {
         const link = await getYtlink(`${info.name} ${info.artists[0]}`)
         if (!link) throw new SpotifyDlError(`Couldn't get a download URL for the track: ${info.name}`)
-        return await downloadYT(info, link, destinationDir)
+        return await downloadYT(link, destinationDir)
     }
 
     private downloadBatch = async (url: string, type: 'album' | 'playlist', destinationDir: string): Promise<(string | Buffer)[]> => {
